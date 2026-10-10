@@ -33,7 +33,7 @@ header.header.header--desktop
         if user
             a.nav__el.nav__el--logout Log out
             a.nav__el(href='/me')
-                img.nav__user-img(src=`/img/users/${user.photo}`, alt=`Photo of ${user.name}`)
+                img.nav__user-img(src=user.photo, alt=`Photo of ${user.name}`)
                 span= user.name.split(' ')[0]
         else
             a.nav__el(href='/login') Log in
@@ -53,7 +53,7 @@ header.header.header--mobile
         if user
             button.m-sub__link.nav__el--logout(type='button') Log Out
             a(href='/me')
-                img.m-avatar(src=`/img/users/${user.photo}`, alt=`Photo of ${user.name}`)
+                img.m-avatar(src=user.photo, alt=`Photo of ${user.name}`)
         else
             a.m-sub__link(href='/login') Log in
     nav.m-drawer
