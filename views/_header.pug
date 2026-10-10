@@ -1,0 +1,105 @@
+style.
+    .header--mobile { display: none !important; }
+    @media only screen and (max-width: 62.5em) {
+        .header--desktop { display: none !important; }
+        .header--mobile { display: block !important; height: auto; padding: 0; background: #2b2b2b; }
+        .m-top, .m-sub { display: flex; align-items: center; }
+        .m-top { justify-content: space-between; padding: 1.4rem 1.8rem 0.6rem; }
+        .m-brand { display: flex; align-items: center; gap: 0.8rem; color: #fff; text-decoration: none; font-weight: 700; letter-spacing: 0.18rem; font-size: 1.5rem; }
+        .m-brand img { height: 2.8rem; }
+        .m-burger { width: 4.2rem; height: 4.2rem; border: 1px solid rgba(255,255,255,.45); border-radius: 0.5rem; background: transparent; display: flex; flex-direction: column; justify-content: center; gap: 0.4rem; cursor: pointer; }
+        .m-burger span { display: block; width: 1.8rem; height: 2px; margin: 0 auto; background: #fff; }
+        .m-sub { justify-content: space-between; padding: 0.8rem 1.8rem 0; }
+        .m-sub__link { color: #fff; text-decoration: none; font-size: 1.5rem; padding-bottom: 0.8rem; background: none; border: none; font-family: inherit; cursor: pointer; }
+        .m-sub__link--active { border-bottom: 3px solid #55c57a; }
+        .m-avatar { width: 3.4rem; height: 3.4rem; border-radius: 50%; object-fit: cover; }
+        .m-drawer { position: fixed; inset: 0 0 0 auto; width: min(30rem, 84vw); background: #242424; z-index: 500; transform: translateX(105%); transition: transform .3s ease; display: flex; flex-direction: column; padding: 1.6rem; }
+        .m-drawer--open { transform: translateX(0); }
+        .m-drawer__top { display: flex; align-items: center; justify-content: space-between; color: #fff; margin-bottom: 2rem; }
+        .m-drawer__top a { display: flex; align-items: center; gap: 0.8rem; color: #fff; text-decoration: none; font-weight: 700; letter-spacing: 0.16rem; }
+        .m-drawer__top img { height: 2.6rem; }
+        .m-close { background: none; border: none; color: #fff; font-size: 3rem; cursor: pointer; line-height: 1; }
+        .m-item { display: flex; align-items: center; gap: 1.4rem; color: #fff; text-decoration: none; background: none; border: none; font-family: inherit; font-size: 1.6rem; padding: 1.3rem 1.2rem; border-radius: 0.8rem; cursor: pointer; text-align: left; }
+        .m-item svg { width: 2rem; height: 2rem; fill: none; stroke: #fff; stroke-width: 1.8; }
+        .m-item--active { background: #1f7a4d; }
+    }
+
+header.header.header--desktop
+    nav.nav.nav--tours
+        a.nav__el(href='/') All tours
+    .header__logo
+        img(src='/img/logo-white.png' alt='Natours logo')
+    nav.nav.nav--user
+        if user
+            a.nav__el.nav__el--logout Log out
+            a.nav__el(href='/me')
+                img.nav__user-img(src=`/img/users/${user.photo}`, alt=`Photo of ${user.name}`)
+                span= user.name.split(' ')[0]
+        else
+            a.nav__el(href='/login') Log in
+            a.nav__el.nav__el--cta(href='#') Sign up
+
+header.header.header--mobile
+    .m-top
+        a.m-brand(href='/')
+            img(src='/img/logo-white.png' alt='Natours logo')
+            span NATOURS
+        button.m-burger(type='button' aria-label='Open menu')
+            span
+            span
+            span
+    .m-sub
+        a.m-sub__link.m-sub__link--active(href='/') All Tours
+        if user
+            button.m-sub__link.nav__el--logout(type='button') Log Out
+            a(href='/me')
+                img.m-avatar(src=`/img/users/${user.photo}`, alt=`Photo of ${user.name}`)
+        else
+            a.m-sub__link(href='/login') Log in
+    nav.m-drawer
+        .m-drawer__top
+            a(href='/')
+                img(src='/img/logo-white.png' alt='Natours logo')
+                span NATOURS
+            button.m-close(type='button' aria-label='Close menu') &times;
+        a.m-item.m-item--active(href='/')
+            svg(viewBox='0 0 24 24')
+                path(d='M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z')
+            span All Tours
+        a.m-item(href='/my-tours')
+            svg(viewBox='0 0 24 24')
+                circle(cx='12' cy='8' r='3')
+                path(d='M5 19c1.2-3 3.4-4.5 7-4.5S17.8 16 19 19')
+            span My Bookings
+        a.m-item(href='/me')
+            svg(viewBox='0 0 24 24')
+                path(d='M12 20s-7-4.4-7-10a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 5.6-7 10-7 10z')
+            span My Reviews
+        a.m-item(href='/me')
+            svg(viewBox='0 0 24 24')
+                circle(cx='12' cy='12' r='3')
+                path(d='M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4')
+            span Settings
+        if user
+            button.m-item.nav__el--logout(type='button')
+                svg(viewBox='0 0 24 24')
+                    path(d='M10 7V5a2 2 0 0 1 2-2h7v18h-7a2 2 0 0 1-2-2v-2')
+                    path(d='M4 12h11M11 8l4 4-4 4')
+                span Log Out
+        else
+            a.m-item(href='/login')
+                span Log in
+
+script.
+    document.addEventListener('DOMContentLoaded', function () {
+        var burger = document.querySelector('.m-burger');
+        var drawer = document.querySelector('.m-drawer');
+        var closeBtn = document.querySelector('.m-close');
+        if (!burger || !drawer || !closeBtn) return;
+        burger.addEventListener('click', function () {
+            drawer.classList.add('m-drawer--open');
+        });
+        closeBtn.addEventListener('click', function () {
+            drawer.classList.remove('m-drawer--open');
+        });
+    });
