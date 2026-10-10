@@ -2,12 +2,20 @@
 
 const multer = require('multer');
 const sharp = require('sharp');
+const cloudinary = require('cloudinary').v2;
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
-// MULTER STORAGE
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// MULTER STORAGE (memory so we can resize then upload)
 const multerStorage = multer.memoryStorage();
 
 // MULTER FILTER
@@ -28,17 +36,36 @@ const upload = multer({
 // UPLOAD USER PHOTO
 exports.uploadUserPhoto = upload.single('photo');
 
-// RESIZE USER PHOTO
+// RESIZE + UPLOAD TO CLOUDINARY
 exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
 
-  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
-
-  await sharp(req.file.buffer)
+  // Resize the image in memory
+  const buffer = await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.file.filename}`);
+    .toBuffer();
+
+  // Upload to Cloudinary
+  const result = await new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'natours/users',
+        public_id: `user-${req.user.id}-${Date.now()}`,
+        format: 'jpg',
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      },
+    );
+
+    uploadStream.end(buffer);
+  });
+
+  // Save the Cloudinary URL so it gets stored in the database
+  req.file.filename = result.secure_url;
 
   next();
 });
@@ -77,7 +104,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   // 2) Filter out unwanted fields
   const filteredBody = filterObj(req.body, 'name', 'email');
 
-  // 3) Add uploaded photo
+  // 3) Add uploaded photo URL
   if (req.file) {
     filteredBody.photo = req.file.filename;
   }
@@ -87,8 +114,6 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
-
-  // DEBUG
 
   res.status(200).json({
     status: 'success',
